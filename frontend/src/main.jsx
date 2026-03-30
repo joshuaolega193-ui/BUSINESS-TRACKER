@@ -1,0 +1,23 @@
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
+import './index.css';
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <App />
+);
+
+// --- SERVICE WORKER REGISTRATION ---
+// This part enables the "Add to Home Screen" feature
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker
+      .register('/sw.js')
+      .then((reg) => {
+        console.log('Service Worker registered successfully!', reg.scope);
+      })
+      .catch((err) => {
+        console.error('Service Worker registration failed:', err);
+      });
+  });
+}
