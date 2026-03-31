@@ -104,11 +104,13 @@ SIMPLE_JWT = {
 
 # --- CORS & TRAFFIC ---
 CORS_ALLOWED_ORIGINS = [
-    "https://your-app-name.vercel.app", # Replace with your Vercel URL later
+    "https://business-tracker-lake.vercel.app", # Replace with your Vercel URL later
     "http://localhost:5173",
     "http://localhost:3000",
 ]
-
+CSRF_TRUSTED_ORIGINS = [
+    "https://business-tracker-lake.vercel.app"
+]
 # --- STATIC FILES (REQUIRED FOR RENDER) ---
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
