@@ -5,15 +5,15 @@ const API_URL = 'https://oletech-businesstracker.hf.space/api';
 const getHeaders = () => {
   const token = localStorage.getItem('access_token');
   
-  // FIX: Guard against missing tokens to prevent 401 errors
+  // FIX: If no token, log it so we can see it in the console
   if (!token) {
-    console.error("No access token found in localStorage");
-    throw new Error("UNAUTHORIZED"); 
+    console.error("DEBUG: No access token found in LocalStorage!");
+    throw new Error("UNAUTHORIZED");
   }
 
   return {
     headers: { 
-      'Authorization': `Bearer ${token}`,
+      'Authorization': `Bearer ${token}`, // Double-check the space after Bearer
       'Content-Type': 'application/json'
     }
   };
