@@ -1,39 +1,17 @@
-const BASE_URL = ''https://oletech-businesstracker.hf.space/api'/api';
+import axios from 'axios';
 
-const authHeaders = () => ({
-  'Content-Type': 'application/json',
-  'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-});
+const BASE_URL = 'https://oletech-businesstracker.hf.space/api';
 
-export const getExpenses = async () => {
-  const res = await fetch(`${BASE_URL}/dashboard/expenses/`, {
-    headers: authHeaders(),
+export const getExpenses = async (token) => {
+  const response = await axios.get(`${BASE_URL}/expenses/`, {
+    headers: { Authorization: `Bearer ${token}` }
   });
-  return res.json();
+  return response.data;
 };
 
-export const createExpense = async (data) => {
-  const res = await fetch(`${BASE_URL}/dashboard/expenses/`, {
-    method: 'POST',
-    headers: authHeaders(),
-    body: JSON.stringify(data),
+export const addExpense = async (expenseData, token) => {
+  const response = await axios.post(`${BASE_URL}/expenses/`, expenseData, {
+    headers: { Authorization: `Bearer ${token}` }
   });
-  return res.json();
-};
-
-export const updateExpense = async (id, data) => {
-  const res = await fetch(`${BASE_URL}/dashboard/expenses/${id}/`, {
-    method: 'PUT',
-    headers: authHeaders(),
-    body: JSON.stringify(data),
-  });
-  return res.json();
-};
-
-export const deleteExpense = async (id) => {
-  const res = await fetch(`${BASE_URL}/dashboard/expenses/${id}/`, {
-    method: 'DELETE',
-    headers: authHeaders(),
-  });
-  return res.ok;
+  return response.data;
 };
