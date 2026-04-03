@@ -1,45 +1,34 @@
 import axios from 'axios';
+
 const BASE_URL = 'https://oletech-businesstracker.hf.space/api';
 
-// Helper to get auth headers
-const authHeaders = () => ({
-  'Content-Type': 'application/json',
-  'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-});
+// Helper function to always get the freshest token
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('access_token');
+  return {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': token ? `Bearer ${token}` : ''
+    }
+  };
+};
 
-// Get all sales
 export const getSales = async () => {
-  const res = await fetch(`${BASE_URL}/dashboard/sales/`, {
-    headers: authHeaders(),
-  });
-  return res.json();
+  const res = await axios.get(`${BASE_URL}/dashboard/sales/`, getAuthHeaders());
+  return res.data;
 };
 
-// Add a new sale
 export const createSale = async (data) => {
-  const res = await fetch(`${BASE_URL}/dashboard/sales/`, {
-    method: 'POST',
-    headers: authHeaders(),
-    body: JSON.stringify(data),
-  });
-  return res.json();
+  const res = await axios.post(`${BASE_URL}/dashboard/sales/`, data, getAuthHeaders());
+  return res.data;
 };
 
-// Update an existing sale
 export const updateSale = async (id, data) => {
-  const res = await fetch(`${BASE_URL}/dashboard/sales/${id}/`, {
-    method: 'PUT',
-    headers: authHeaders(),
-    body: JSON.stringify(data),
-  });
-  return res.json();
+  const res = await axios.put(`${BASE_URL}/dashboard/sales/${id}/`, data, getAuthHeaders());
+  return res.data;
 };
 
-// Delete a sale
 export const deleteSale = async (id) => {
-  const res = await fetch(`${BASE_URL}/dashboard/sales/${id}/`, {
-    method: 'DELETE',
-    headers: authHeaders(),
-  });
-  return res.ok;
+  const res = await axios.delete(`${BASE_URL}/dashboard/sales/${id}/`, getAuthHeaders());
+  return res.status === 204 || res.status === 200;
 };
