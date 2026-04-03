@@ -1,21 +1,22 @@
 import axios from 'axios';
 
-const API_URL = 'https://oletech-businesstracker.hf.space/api';
+// FIX: Removed '/api' from the end
+const API_URL = 'https://oletech-businesstracker.hf.space';
 
 export const loginUser = async (credentials) => {
-  // Removed the slash after login
+  // Resulting URL: https://oletech-businesstracker.hf.space/login
   const response = await axios.post(`${API_URL}/login`, credentials);
   return response.data;
 };
 
 export const registerUser = async (userData) => {
-  // Removed the slash after register
+  // Resulting URL: https://oletech-businesstracker.hf.space/register
   const response = await axios.post(`${API_URL}/register`, userData);
   return response.data;
 };
 
 export const getProfile = async (token) => {
-  // Removed the slash after profile
+  // Resulting URL: https://oletech-businesstracker.hf.space/profile
   const response = await axios.get(`${API_URL}/profile`, {
     headers: {
       Authorization: `Bearer ${token}`
