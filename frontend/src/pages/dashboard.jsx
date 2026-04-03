@@ -20,7 +20,6 @@ export default function Dashboard() {
     const loadDashboardData = async () => {
       try {
         const token = localStorage.getItem('access_token');
-        
         if (!token) {
           navigate('/login');
           return;
@@ -35,11 +34,9 @@ export default function Dashboard() {
         setSummary(summaryData);
         setLoading(false);
         addToast('Dashboard loaded successfully', 'success');
-        
       } catch (error) {
         console.error("Dashboard Load Error:", error);
         setLoading(false);
-        
         if (error.response?.status === 401) {
           localStorage.removeItem('access_token');
           navigate('/login');
@@ -48,7 +45,6 @@ export default function Dashboard() {
         }
       }
     };
-
     loadDashboardData();
   }, [navigate, addToast]);
 
@@ -63,7 +59,7 @@ export default function Dashboard() {
       <div className="min-h-screen flex items-center justify-center text-gray-500 text-sm">
         <div className="flex flex-col items-center gap-2">
           <div className="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-          Loading...
+          Loading dashboard...
         </div>
       </div>
     );
@@ -104,15 +100,11 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Toast toasts={toasts} removeToast={removeToast} />
-
       <nav className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
         <h1 className="text-lg font-bold text-indigo-600">Business Tracker</h1>
         <div className="flex items-center gap-4">
           <button onClick={() => navigate('/sales')} className="text-sm text-gray-500 hover:text-indigo-600">Sales</button>
           <button onClick={() => navigate('/expenses')} className="text-sm text-gray-500 hover:text-indigo-600">Expenses</button>
-          <button onClick={() => navigate('/invoices')} className="text-sm text-gray-500 hover:text-indigo-600">Invoices</button>
-          <button onClick={() => navigate('/receipts')} className="text-sm text-gray-500 hover:text-indigo-600">Receipts</button>
-          <button onClick={() => navigate('/inventory')} className="text-sm text-gray-500 hover:text-indigo-600">Inventory</button>
           <button onClick={() => navigate('/reports')} className="text-sm text-gray-500 hover:text-indigo-600 font-medium">Reports</button>
           <span className="text-sm text-gray-600">{user?.business_name || user?.name}</span>
           <button onClick={handleLogout} className="text-sm text-red-500 hover:underline">Logout</button>
@@ -121,8 +113,7 @@ export default function Dashboard() {
 
       <main className="max-w-6xl mx-auto px-6 py-10">
         <h2 className="text-2xl font-bold text-gray-800 mb-1">Welcome, {user?.name}</h2>
-        <p className="text-sm text-gray-500 mb-8">{user?.business_name} · {user?.currency} · {user?.email}</p>
-
+        <p className="text-sm text-gray-500 mb-8">{user?.business_name} · {user?.currency}</p>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
           {stats.map((stat) => (
             <div key={stat.label} className={`${stat.bg} rounded-2xl border border-gray-100 p-6`}>
@@ -133,35 +124,9 @@ export default function Dashboard() {
             </div>
           ))}
         </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-            <h3 className="text-base font-semibold text-gray-700 mb-4">Monthly Sales</h3>
-            <Bar data={chartData} options={chartOptions} />
-          </div>
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
-            <h3 className="text-base font-semibold text-gray-700 mb-4">Recent Transactions</h3>
-            {summary?.recent_transactions?.length === 0 ? (
-              <p className="text-sm text-gray-400 text-center py-8">No transactions yet.</p>
-            ) : (
-              <div className="space-y-3">
-                {summary?.recent_transactions?.map((tx, index) => (
-                  <div key={index} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
-                    <div className="flex items-center gap-3">
-                      <span className={`w-2.5 h-2.5 rounded-full ${tx.type === 'sale' ? 'bg-green-400' : 'bg-red-400'}`} />
-                      <div>
-                        <p className="text-sm font-medium text-gray-700">{tx.description}</p>
-                        <p className="text-xs text-gray-400">{tx.date}</p>
-                      </div>
-                    </div>
-                    <span className={`text-sm font-semibold ${tx.type === 'sale' ? 'text-green-600' : 'text-red-500'}`}>
-                      {tx.type === 'sale' ? '+' : '-'}{user?.currency} {Number(tx.amount).toLocaleString()}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <h3 className="text-base font-semibold text-gray-700 mb-4">Monthly Sales</h3>
+          <Bar data={chartData} options={chartOptions} />
         </div>
       </main>
     </div>
