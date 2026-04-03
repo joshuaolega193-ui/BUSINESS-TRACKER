@@ -1,11 +1,20 @@
 import axios from 'axios';
 
-// 1. Django usually expects the /api prefix if that's how your urls.py is set up
 const API_URL = 'https://oletech-businesstracker.hf.space/api'; 
 
 export const loginUser = async (credentials) => {
-  // 2. CRITICAL: Django MANDATES the trailing slash (the '/' at the end)
-  const response = await axios.post(`${API_URL}/login/`, credentials); 
+  const response = await axios.post(`${API_URL}/login/`, credentials);
+  
+  // FIX: Save the token immediately upon successful login
+  // Django SimpleJWT usually returns the token in a field called 'access'
+  if (response.data && response.data.access) {
+    localStorage.setItem('access_token', response.data.access);
+    // If your backend also sends a refresh token, save it too:
+    if (response.data.refresh) {
+      localStorage.setItem('refresh_token', response.data.refresh);
+    }
+  }
+  
   return response.data;
 };
 
