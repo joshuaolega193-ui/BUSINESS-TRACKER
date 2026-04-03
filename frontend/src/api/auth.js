@@ -1,28 +1,13 @@
-// This tells Vite: Use the Vercel secret if it exists, otherwise use localhost
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+import axios from 'axios';
 
-export const registerUser = async (data) => {
-  const res = await fetch(`${BASE_URL}/register`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
-  return res.json();
+const API_URL = 'https://oletech-businesstracker.hf.space/api';
+
+export const login = async (credentials) => {
+  const response = await axios.post(`${API_URL}/login/`, credentials);
+  return response.data;
 };
 
-export const loginUser = async (data) => {
-  const res = await fetch(`${BASE_URL}/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  });
-  return res.json();
-};
-
-export const getProfile = async () => {
-  const token = localStorage.getItem('access_token');
-  const res = await fetch(`${BASE_URL}/profile`, {
-    headers: { 'Authorization': `Bearer ${token}` },
-  });
-  return res.json();
+export const register = async (userData) => {
+  const response = await axios.post(`${API_URL}/register/`, userData);
+  return response.data;
 };

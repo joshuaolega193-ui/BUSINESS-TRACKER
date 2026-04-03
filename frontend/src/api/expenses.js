@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:8000/api';
+const BASE_URL = ''https://oletech-businesstracker.hf.space/api'/api';
 
 const authHeaders = () => ({
   'Content-Type': 'application/json',

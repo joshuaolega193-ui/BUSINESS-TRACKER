@@ -1,9 +1,10 @@
-const BASE_URL = 'http://localhost:8000/api';
+import axios from 'axios';
 
-export const getDashboardSummary = async () => {
-  const token = localStorage.getItem('access_token');
-  const res = await fetch(`${BASE_URL}/dashboard/summary`, {
-    headers: { 'Authorization': `Bearer ${token}` },
+const BASE_URL = 'https://oletech-businesstracker.hf.space/api';
+
+export const getDashboardSummary = async (token) => {
+  const response = await axios.get(`${BASE_URL}/dashboard/summary/`, {
+    headers: { Authorization: `Bearer ${token}` }
   });
-  return res.json();
+  return response.data;
 };

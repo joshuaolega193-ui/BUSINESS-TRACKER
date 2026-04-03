@@ -196,8 +196,12 @@ export default function Receipts() {
             className="text-sm text-gray-500 hover:text-indigo-600">Expenses</button>
           <button onClick={() => navigate('/invoices')}
             className="text-sm text-gray-500 hover:text-indigo-600">Invoices</button>
+          <button onClick={() => navigate('/receipts')}
+            className="text-sm font-semibold text-indigo-600">Receipts</button>
           <button onClick={() => navigate('/inventory')}
             className="text-sm text-gray-500 hover:text-indigo-600">Inventory</button>
+          <button onClick={() => navigate('/reports')}
+            className="text-sm text-gray-500 hover:text-indigo-600">Reports</button>
           <span className="text-sm text-gray-600">{user?.business_name}</span>
           <button onClick={() => {
             localStorage.removeItem('access_token');

@@ -1,5 +1,6 @@
-const BASE_URL = 'http://localhost:8000/api';
 
+import axios from 'axios';
+const BASE_URL = 'https://oletech-businesstracker.hf.space/api';
 const authHeaders = () => ({
   'Content-Type': 'application/json',
   'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
