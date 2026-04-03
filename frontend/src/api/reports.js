@@ -1,37 +1,43 @@
 import axios from 'axios';
+
 const BASE_URL = 'https://oletech-businesstracker.hf.space/api';
 
-const authHeaders = () => ({
-  'Content-Type': 'application/json',
-  'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-});
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('access_token');
+  return {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': token ? `Bearer ${token}` : ''
+    }
+  };
+};
 
 export const getReportSummary = async (startDate, endDate) => {
-  const res = await fetch(
+  // Added trailing slash BEFORE the query parameters
+  const res = await axios.get(
     `${BASE_URL}/reports/summary/?start=${startDate}&end=${endDate}`,
-    { headers: authHeaders() }
+    getAuthHeaders()
   );
-  return res.json();
+  return res.data;
 };
 
 export const exportReportCSV = (startDate, endDate) => {
   const token = localStorage.getItem('access_token');
+  // Added trailing slash BEFORE the query parameters
   const url = `${BASE_URL}/reports/export/?start=${startDate}&end=${endDate}`;
 
-  // Create a temporary link to trigger download
-  const link = document.createElement('a');
-  link.href = url;
-  link.setAttribute('download', `report_${startDate}_to_${endDate}.csv`);
-
-  // Add auth header via fetch then download
+  // Fetch with auth header, convert to blob, and trigger download
   fetch(url, { headers: { 'Authorization': `Bearer ${token}` } })
     .then((res) => res.blob())
     .then((blob) => {
-      const url = window.URL.createObjectURL(blob);
-      link.href = url;
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.setAttribute('download', `report_${startDate}_to_${endDate}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    });
+      window.URL.revokeObjectURL(downloadUrl);
+    })
+    .catch((err) => console.error('Export failed:', err));
 };

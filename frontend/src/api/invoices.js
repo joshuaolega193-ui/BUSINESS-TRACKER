@@ -1,47 +1,44 @@
 import axios from 'axios';
+
 const BASE_URL = 'https://oletech-businesstracker.hf.space/api';
 
-const authHeaders = () => ({
-  'Content-Type': 'application/json',
-  'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
-});
+// Fixed to be a dynamic function that pulls the latest token
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('access_token');
+  return {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': token ? `Bearer ${token}` : ''
+    }
+  };
+};
 
 export const getInvoices = async () => {
-  const res = await fetch(`${BASE_URL}/invoices/`, {
-    headers: authHeaders(),
-  });
-  return res.json();
+  // Added trailing slash
+  const res = await axios.get(`${BASE_URL}/invoices/`, getAuthHeaders());
+  return res.data;
 };
 
 export const getInvoice = async (id) => {
-  const res = await fetch(`${BASE_URL}/invoices/${id}/`, {
-    headers: authHeaders(),
-  });
-  return res.json();
+  // Added trailing slash
+  const res = await axios.get(`${BASE_URL}/invoices/${id}/`, getAuthHeaders());
+  return res.data;
 };
 
 export const createInvoice = async (data) => {
-  const res = await fetch(`${BASE_URL}/invoices/`, {
-    method: 'POST',
-    headers: authHeaders(),
-    body: JSON.stringify(data),
-  });
-  return res.json();
+  // Added trailing slash
+  const res = await axios.post(`${BASE_URL}/invoices/`, data, getAuthHeaders());
+  return res.data;
 };
 
 export const updateInvoice = async (id, data) => {
-  const res = await fetch(`${BASE_URL}/invoices/${id}/`, {
-    method: 'PUT',
-    headers: authHeaders(),
-    body: JSON.stringify(data),
-  });
-  return res.json();
+  // Added trailing slash
+  const res = await axios.put(`${BASE_URL}/invoices/${id}/`, data, getAuthHeaders());
+  return res.data;
 };
 
 export const deleteInvoice = async (id) => {
-  const res = await fetch(`${BASE_URL}/invoices/${id}/`, {
-    method: 'DELETE',
-    headers: authHeaders(),
-  });
-  return res.ok;
+  // Added trailing slash
+  const res = await axios.delete(`${BASE_URL}/invoices/${id}/`, getAuthHeaders());
+  return res.status === 204 || res.status === 200;
 };

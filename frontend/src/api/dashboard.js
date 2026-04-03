@@ -1,5 +1,4 @@
 import axios from 'axios';
-
 const BASE_URL = 'https://oletech-businesstracker.hf.space/api';
 
 export const getDashboardSummary = async (token) => {
