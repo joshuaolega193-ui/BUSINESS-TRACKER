@@ -16,14 +16,19 @@ export default function Login() {
     e.preventDefault();
     setError('');
     setLoading(true);
-    const data = await loginUser(form);
-    setLoading(false);
-    if (data.access) {
-      localStorage.setItem('access_token', data.access);
-      localStorage.setItem('refresh_token', data.refresh);
-      navigate('/dashboard');
-    } else {
-      setError(data.error || 'Login failed. Check your credentials.');
+    try {
+      const data = await loginUser(form);
+      setLoading(false);
+      if (data.access) {
+        localStorage.setItem('access_token', data.access);
+        localStorage.setItem('refresh_token', data.refresh);
+        navigate('/dashboard');
+      } else {
+        setError(data.error || 'Login failed. Check your credentials.');
+      }
+    } catch (err) {
+      setLoading(false);
+      setError(err.response?.data?.error || 'Login failed. Check your credentials.');
     }
   };
 
