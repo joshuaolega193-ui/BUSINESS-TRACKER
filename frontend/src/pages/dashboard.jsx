@@ -46,7 +46,7 @@ export default function Dashboard() {
       }
     };
     loadDashboardData();
-  }, [navigate, addToast]);
+  }, [navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem('access_token');
