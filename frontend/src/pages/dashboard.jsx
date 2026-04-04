@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
@@ -15,8 +15,12 @@ export default function Dashboard() {
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
   const { toasts, addToast, removeToast } = useToast();
+  const hasLoaded = useRef(false);
 
   useEffect(() => {
+    if (hasLoaded.current) return;
+    hasLoaded.current = true;
+
     const loadDashboardData = async () => {
       try {
         const token = localStorage.getItem('access_token');
@@ -105,6 +109,9 @@ export default function Dashboard() {
         <div className="flex items-center gap-4">
           <button onClick={() => navigate('/sales')} className="text-sm text-gray-500 hover:text-indigo-600">Sales</button>
           <button onClick={() => navigate('/expenses')} className="text-sm text-gray-500 hover:text-indigo-600">Expenses</button>
+          <button onClick={() => navigate('/invoices')} className="text-sm text-gray-500 hover:text-indigo-600">Invoices</button>
+          <button onClick={() => navigate('/receipts')} className="text-sm text-gray-500 hover:text-indigo-600">Receipts</button>
+          <button onClick={() => navigate('/inventory')} className="text-sm text-gray-500 hover:text-indigo-600">Inventory</button>
           <button onClick={() => navigate('/reports')} className="text-sm text-gray-500 hover:text-indigo-600 font-medium">Reports</button>
           <span className="text-sm text-gray-600">{user?.business_name || user?.name}</span>
           <button onClick={handleLogout} className="text-sm text-red-500 hover:underline">Logout</button>
