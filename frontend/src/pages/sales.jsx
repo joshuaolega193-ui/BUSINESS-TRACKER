@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getSales, createSale, updateSale, deleteSale } from '../api/sales';
 import { getProfile } from '../api/auth';
@@ -14,6 +14,7 @@ export default function Sales() {
   const [editingSale, setEditingSale] = useState(null);
   const [error, setError] = useState('');
   const { toasts, addToast, removeToast } = useToast();
+  const hasLoaded = useRef(false);
 
   const emptyForm = {
     item_name: '',
@@ -25,14 +26,24 @@ export default function Sales() {
   const [form, setForm] = useState(emptyForm);
 
   useEffect(() => {
-    Promise.all([getProfile(), getSales()])
+    if (hasLoaded.current) return;
+    hasLoaded.current = true;
+
+    const token = localStorage.getItem('access_token');
+    if (!token) { navigate('/login'); return; }
+
+    Promise.all([getProfile(token), getSales()])
       .then(([userData, salesData]) => {
-        if (!userData.id) { navigate('/login'); return; }
         setUser(userData);
         setSales(Array.isArray(salesData) ? salesData : []);
         setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setLoading(false);
+        navigate('/login');
       });
-  }, []);
+  }, [navigate]);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -43,20 +54,24 @@ export default function Sales() {
       setError('All fields are required');
       return;
     }
-    if (editingSale) {
-      const updated = await updateSale(editingSale.id, form);
-      if (updated.id) {
-        setSales(sales.map((s) => s.id === updated.id ? updated : s));
-        addToast('Sale updated successfully', 'success');
-        resetForm();
-      } else { setError('Failed to update sale'); }
-    } else {
-      const newSale = await createSale(form);
-      if (newSale.id) {
-        setSales([newSale, ...sales]);
-        addToast('Sale recorded successfully', 'success');
-        resetForm();
-      } else { setError('Failed to create sale'); }
+    try {
+      if (editingSale) {
+        const updated = await updateSale(editingSale.id, form);
+        if (updated.id) {
+          setSales(sales.map((s) => s.id === updated.id ? updated : s));
+          addToast('Sale updated successfully', 'success');
+          resetForm();
+        } else { setError('Failed to update sale'); }
+      } else {
+        const newSale = await createSale(form);
+        if (newSale.id) {
+          setSales([newSale, ...sales]);
+          addToast('Sale recorded successfully', 'success');
+          resetForm();
+        } else { setError('Failed to create sale'); }
+      }
+    } catch (err) {
+      setError('Something went wrong. Please try again.');
     }
   };
 
@@ -101,28 +116,17 @@ export default function Sales() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Toast toasts={toasts} removeToast={removeToast} />
-
       <nav className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-        <h1 className="text-lg font-bold text-indigo-600 cursor-pointer"
-          onClick={() => navigate('/dashboard')}>
+        <h1 className="text-lg font-bold text-indigo-600 cursor-pointer" onClick={() => navigate('/dashboard')}>
           Business Tracker
         </h1>
         <div className="flex items-center gap-4">
-          <button onClick={() => navigate('/dashboard')}
-            className="text-sm text-gray-500 hover:text-indigo-600">Dashboard</button>
-          <button onClick={() => navigate('/expenses')}
-            className="text-sm text-gray-500 hover:text-indigo-600">Expenses</button>
-          <button onClick={() => navigate('/invoices')}
-            className="text-sm text-gray-500 hover:text-indigo-600">Invoices</button>
-          <button onClick={() => navigate('/receipts')}
-            className="text-sm text-gray-500 hover:text-indigo-600">Receipts</button>
-          <button onClick={() => navigate('/inventory')}
-            className="text-sm text-gray-500 hover:text-indigo-600">Inventory</button>
-          
-          {/* --- ADDED REPORTS BUTTON --- */}
-          <button onClick={() => navigate('/reports')}
-            className="text-sm text-gray-500 hover:text-indigo-600">Reports</button>
-
+          <button onClick={() => navigate('/dashboard')} className="text-sm text-gray-500 hover:text-indigo-600">Dashboard</button>
+          <button onClick={() => navigate('/expenses')} className="text-sm text-gray-500 hover:text-indigo-600">Expenses</button>
+          <button onClick={() => navigate('/invoices')} className="text-sm text-gray-500 hover:text-indigo-600">Invoices</button>
+          <button onClick={() => navigate('/receipts')} className="text-sm text-gray-500 hover:text-indigo-600">Receipts</button>
+          <button onClick={() => navigate('/inventory')} className="text-sm text-gray-500 hover:text-indigo-600">Inventory</button>
+          <button onClick={() => navigate('/reports')} className="text-sm text-gray-500 hover:text-indigo-600">Reports</button>
           <span className="text-sm text-gray-600">{user?.business_name}</span>
           <button onClick={() => {
             localStorage.removeItem('access_token');
@@ -155,9 +159,7 @@ export default function Sales() {
               {editingSale ? 'Edit Sale' : 'New Sale'}
             </h3>
             {error && (
-              <div className="bg-red-50 text-red-600 text-sm px-4 py-3 rounded-lg mb-4">
-                {error}
-              </div>
+              <div className="bg-red-50 text-red-600 text-sm px-4 py-3 rounded-lg mb-4">{error}</div>
             )}
             <form onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -239,10 +241,8 @@ export default function Sales() {
                     <td className="px-6 py-4 text-gray-500">{sale.date}</td>
                     <td className="px-6 py-4">
                       <div className="flex gap-3">
-                        <button onClick={() => handleEdit(sale)}
-                          className="text-indigo-600 hover:underline text-sm">Edit</button>
-                        <button onClick={() => handleDelete(sale.id)}
-                          className="text-red-500 hover:underline text-sm">Delete</button>
+                        <button onClick={() => handleEdit(sale)} className="text-indigo-600 hover:underline text-sm">Edit</button>
+                        <button onClick={() => handleDelete(sale.id)} className="text-red-500 hover:underline text-sm">Delete</button>
                       </div>
                     </td>
                   </tr>
@@ -250,9 +250,7 @@ export default function Sales() {
               </tbody>
               <tfoot className="border-t border-gray-100 bg-gray-50">
                 <tr>
-                  <td colSpan={3} className="px-6 py-3 text-gray-500 font-medium text-sm">
-                    Grand Total
-                  </td>
+                  <td colSpan={3} className="px-6 py-3 text-gray-500 font-medium text-sm">Grand Total</td>
                   <td className="px-6 py-3 text-green-600 font-bold text-sm">
                     {user?.currency} {grandTotal.toLocaleString()}
                   </td>
