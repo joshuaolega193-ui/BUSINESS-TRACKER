@@ -37,7 +37,7 @@ export default function Dashboard() {
       } catch (error) {
         console.error("Dashboard Load Error:", error);
         setLoading(false);
-        if (error.response?.status === 401) {
+        if (error.message === 'UNAUTHORIZED' || error.response?.status === 401) {
           localStorage.removeItem('access_token');
           navigate('/login');
         } else {
